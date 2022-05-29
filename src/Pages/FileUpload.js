@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -14,6 +14,27 @@ export default function FileUpload() {
         percent:0,
         loaded:false
     })
+    const [jwt, setJwt] = useState({
+        token:''
+    })
+    useEffect(()=>{
+        try {
+            let user=JSON.parse(localStorage.getItem('user'))
+
+            if(user){
+              //logged in
+              setJwt({
+                ...jwt,
+                token:user.jwt
+            })
+            }else
+            {
+              //not logged in
+            }
+          } catch (error) {
+            
+          }
+    },[])
 
     //2.functions
     let handleChange =  (e)=>{
@@ -38,6 +59,10 @@ export default function FileUpload() {
                  let upload_response = await axios({
                         method:'POST',
                         url:`${config.dev_api_url}/api/upload`,
+                        headers:{
+                            'content-type':'application/json',
+                            'Authorization':`Bearer ${jwt}`
+                        },
                         data,
                         onUploadProgress:(progress)=>{
                             console.log(progress);
